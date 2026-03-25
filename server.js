@@ -5,7 +5,8 @@ import path from 'path';
 import errorHandler from './src/middlewares/error/errorHandler.js'
 import logger from './src/middlewares/debug/logger.js'
 import session from './src/config/session.js';
-import requireAuth from './src/middlewares/sessionAuth.js'
+import requireAuth from './src/middlewares/session/sessionAuth.js'
+import checkAuthenticated from './src/middlewares/session/checkSession.js';
 import { fileURLToPath } from 'url';
 
 const PORT = process.env.PORT || 5000;
@@ -28,7 +29,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use((session));
 
 // Routes
-app.get('/', (req, res) => {
+app.get('/', checkAuthenticated, (req, res) => {
     const sessionId = req.sessionID;
     console.log(sessionId)
     res.sendFile(path.join(__dirname, 'public', 'views', 'login.html'));

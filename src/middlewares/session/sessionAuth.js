@@ -2,7 +2,7 @@ const requireAuth = (req, res, next) => {
     if (!req.session.userId) {
         return res.redirect("/");
     }
-    next ();
+    next();
 };
 
 export default requireAuth;
