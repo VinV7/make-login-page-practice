@@ -15,10 +15,13 @@ form.onsubmit = async (e) => {
             body: JSON.stringify({ username, password })
         }) 
 
-        console.log("Status:", res.status);
+        const data = await res.json();
 
-        const text = await res.text();
-        console.log("Server response:", text);
+        console.log("Server response:", data);
+
+        if (data.success) {
+            window.location.href = data.redirect;
+        }
     } catch (error) {
         console.error('Fetch Failed : ', error);
     }

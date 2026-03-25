@@ -14,8 +14,19 @@ const loginAuthenticate = async (req, res, next) => {
             return res.status(401).json({ message : 'Invalid Credentials'});
         }
 
-        // console.log('Login Successful')
-        return res.status(200).json({ message: 'Login Successful' });
+        req.session.regenerate((err) => {
+            if (err) return next(err);
+
+            req.session.userId = user.id;
+
+            req.session.save((err) => {
+                if (err) return next(err);
+                return res.json({
+                    success: true,
+                    redirect: "/home"
+                });
+            });
+        });
     } catch (error) {
         next(error);
     }
