@@ -39,7 +39,7 @@ app.use('/auth', authRoutes);
 
 app.get('/home', requireAuth, (req, res) => {
     console.log(req.session)
-    res.sendFile(path.join(__dirname, 'public', 'views', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'views', 'homepage.html'));
 });
 
 // Error handler

@@ -24,7 +24,7 @@ const loginAuthenticate = async (req, res, next) => {
                 console.log('Login Successful')
                 return res.json({
                     success: true,
-                    redirect: "/home"
+                    redirect: '/home'
                 });
             });
         });
@@ -34,4 +34,16 @@ const loginAuthenticate = async (req, res, next) => {
 
 };
 
-export default loginAuthenticate;
+const logoutFromSite = (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) return res.sendStatus(500);
+
+        res.clearCookie('connect.sid');
+        return res.json({
+            success: true,
+            redirect: '/'
+        });
+    });
+}
+
+export { loginAuthenticate, logoutFromSite };

@@ -16,7 +16,6 @@ form.onsubmit = async (e) => {
         }) 
 
         const data = await res.json();
-
         console.log("Server response:", data);
 
         if (data.success) {
