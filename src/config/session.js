@@ -1,10 +1,13 @@
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
+
+// Session store DB initialization
 const pgSession = connectPgSimple(session);
 
+// Cookie & Session settings for the website
 export default session({
     store: new pgSession({
-        conString: "postgres://postgres:123@localhost:5432/loginapp",
+        conString: process.env.DATABASE_URL,
         schemaName: "public",
         tableName: "session"
     }),
@@ -14,7 +17,7 @@ export default session({
     cookie: {
         httpOnly: true,
         secure: false,
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24
     },
-    
 });

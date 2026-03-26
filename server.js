@@ -1,49 +1,56 @@
-import express from 'express';
-import notFound from './src/middlewares/error/notFound.js'
-import authRoutes from './src/routes/authRoutes.js'
-import path from 'path';
-import errorHandler from './src/middlewares/error/errorHandler.js'
-import logger from './src/middlewares/debug/logger.js'
-import session from './src/config/session.js';
-import requireAuth from './src/middlewares/session/sessionAuth.js'
-import checkAuthenticated from './src/middlewares/session/checkSession.js';
-import { fileURLToPath } from 'url';
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const PORT = process.env.PORT || 5000;
-const app = express();
-
-// Logger Debug Middleware
-app.use(logger) 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-
-
-// Express session (Cookies) middleware
-app.use((session));
+// Middlewares
+import logger from "./src/middlewares/debug/logger.js";
+import session from "./src/config/session.js";
+import requireAuth from "./src/middlewares/session/sessionAuth.js";
+import checkAuthenticated from "./src/middlewares/session/checkSession.js";
+import notFound from "./src/middlewares/error/notFound.js";
+import errorHandler from "./src/middlewares/error/errorHandler.js";
 
 // Routes
-app.get('/', checkAuthenticated, (req, res) => {
-    const sessionId = req.sessionID;
-    console.log(sessionId)
-    res.sendFile(path.join(__dirname, 'public', 'views', 'login.html'));
+import authRoutes from "./src/routes/authRoutes.js";
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// === Path Setup ===
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PUBLIC_DIR = path.join(__dirname, "public");
+const VIEWS_DIR = path.join(PUBLIC_DIR, "views");
+
+// === Core Middleware ===
+app.use(logger);
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(session);
+app.use(express.static('public'));
+app.use(express.static(PUBLIC_DIR));
+
+// === Route Handlers ===
+const sendView = (res, file) => {
+  return res.sendFile(path.join(VIEWS_DIR, file));
+};
+
+// === Routes ===
+app.get("/", checkAuthenticated, (req, res) => {
+  return sendView(res, "login.html");
 });
 
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 
-app.get('/home', requireAuth, (req, res) => {
-    console.log(req.session)
-    res.sendFile(path.join(__dirname, 'public', 'views', 'homepage.html'));
+app.get("/home", requireAuth, (req, res) => {
+  return sendView(res, "homepage.html");
 });
 
-// Error handler
+// === Error Handling ===
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+// === Server Start ===
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
